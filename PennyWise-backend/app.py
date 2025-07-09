@@ -11,15 +11,11 @@ db.init_app(app)
 CORS(app)
 jwt = JWTManager(app)
 
-# ----------------------------
 # Create DB tables
-# ----------------------------
 with app.app_context():
     db.create_all()
 
-# ----------------------------
 # Add Expense
-# ----------------------------
 @app.route("/expenses", methods=["POST"])
 def add_expense():
     data = request.get_json()
@@ -37,9 +33,7 @@ def add_expense():
     db.session.commit()
     return jsonify({"message": "Expense added successfully"}), 201
 
-# ----------------------------
 # Get All Expenses
-# ----------------------------
 @app.route("/expenses", methods=["GET"])
 def get_expenses():
     expenses = Expense.query.all()
@@ -54,17 +48,14 @@ def get_expenses():
     ]
     return jsonify(result)
 
-# ----------------------------
 # User Logout (Frontend clears token)
-# ----------------------------
 @app.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
     return jsonify({"message": "Successfully logged out. Please clear the token on client side."}), 200
 
-# ----------------------------
+
 # Set Monthly Budget
-# ----------------------------
 @app.route("/set-budget", methods=["POST"])
 def set_budget():
     data = request.get_json()
@@ -84,9 +75,7 @@ def set_budget():
     db.session.commit()
     return jsonify({"message": f"Budget set for {month}"}), 200
 
-# ----------------------------
 # Get Monthly Budget
-# ----------------------------
 @app.route("/get-budget", methods=["GET"])
 def get_budget():
     month = request.args.get("month")
@@ -99,9 +88,7 @@ def get_budget():
 
     return jsonify({"month": month, "amount": budget.amount}), 200
 
-# ----------------------------
 # Monthly Summary – Total per Category
-# ----------------------------
 @app.route("/monthly-summary", methods=["GET"])
 def monthly_summary():
     from sqlalchemy import func
@@ -118,9 +105,7 @@ def monthly_summary():
     summary = [{"category": cat, "total": float(total)} for cat, total in results]
     return jsonify(summary)
 
-# ----------------------------
 # Progress Tracker – % of budget used
-# ----------------------------
 @app.route("/progress", methods=["GET"])
 def progress():
     from sqlalchemy import func
@@ -143,8 +128,6 @@ def progress():
         "progress": round(percentage, 2)
     })
 
-# ----------------------------
 # Run App
-# ----------------------------
 if __name__ == "__main__":
     app.run(debug=True)
