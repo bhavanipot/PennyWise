@@ -10,6 +10,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-pro")
 
 
+#Will add a RAG Pipeline for more personalized results 
 def ask_assistant(income: float, expenses: float, message: str) -> str:
     prompt = f"""
     You are PennyWise, a smart budgeting assistant for students.
@@ -21,7 +22,8 @@ def ask_assistant(income: float, expenses: float, message: str) -> str:
     return model.generate_content(prompt).text.strip()
 
 
-def budget_breakdown(income: float, fixed_expenses: float, savings_goal: float) -> str:
+#Working on Implementing a Regression Model
+def budget_breakdown(income: float, fixed_expenses: float, savings_goal: float) -> str: 
     prompt = f"""
     Monthly income: ${income}
     Fixed expenses: ${fixed_expenses}
