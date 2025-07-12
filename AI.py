@@ -1,51 +1,78 @@
-import numpy as np
-from sklearn.linear_model import LinearRegression
+# pennywise_ai.py
 
-class BudgetingAI:
-    def __init__(self, income, past_data):
-        self.income = income
-        self.past_data = past_data
-        self.predictions = {}
+import google.generativeai as genai
+import os
+from dotenv import load_dotenv
 
-    def predict_spending(self):
-        X = np.array([[1], [2], [3]])  # months for prediction
-        for category, values in self.past_data.items():
-            y = np.array(values)
-            model = LinearRegression()
-            model.fit(X, y)
-            next_month = np.array([[4]])  # Predict for the next month
-            predicted = model.predict(next_month)[0]
-            self.predictions[category] = round(predicted, 2)
+# Load API key
+load_dotenv()
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+model = genai.GenerativeModel("gemini-pro")
 
-    def recommend_budget(self):
-        self.predict_spending()
 
-        total_predicted_spending = sum(self.predictions.values())
-        
-        # Ensure total recommended spending does not exceed income
-        if total_predicted_spending > self.income:
-            scaling_factor = self.income / total_predicted_spending
-            recommended = {category: round(amount * scaling_factor, 2) for category, amount in self.predictions.items()}
-        else:
-            recommended = self.predictions
-        
-        return recommended
+def ask_assistant(income: float, expenses: float, message: str) -> str:
+    prompt = f"""
+    You are PennyWise, a smart budgeting assistant for students.
+    The user has ${income} in income and ${expenses} in expenses this month.
+    They asked: "{message}"
 
-    def print_budget(self):
-        recommended_budget = self.recommend_budget()
-        print(f"Recommended Budget Allocation for Next Month (Total Income: ${self.income}):")
-        for category, value in recommended_budget.items():
-            print(f" - {category.capitalize()}: ${value}")
+    Provide a short, clear, helpful response based on their financial status.
+    """
+    return model.generate_content(prompt).text.strip()
 
-# have to integrate with backend
-income = 1000  
-past_data = {
-    "food": [120, 130, 125],
-    "transport": [40, 50, 45],
-    "entertainment": [60, 70, 65],
-    "books": [30, 20, 25]
-}
 
-# Create the BudgetingAI object and print the recommended budget
-budget_ai = BudgetingAI(income, past_data)
-budget_ai.print_budget()
+def budget_breakdown(income: float, fixed_expenses: float, savings_goal: float) -> str:
+    prompt = f"""
+    Monthly income: ${income}
+    Fixed expenses: ${fixed_expenses}
+    Savings goal: ${savings_goal}
+
+    Suggest a personalized budget split for food, transportation, entertainment, and miscellaneous.
+    Keep the total under budget.
+    """
+    return model.generate_content(prompt).text.strip()
+
+
+def spending_insights(categories: dict) -> str:
+    breakdown = "\\n".join([f"{k}: ${v}" for k, v in categories.items()])
+    prompt = f"""
+    Here is the student's monthly spending breakdown:
+    {breakdown}
+
+    Provide 3 helpful and actionable tips to reduce unnecessary spending and save more next month.
+    """
+    return model.generate_content(prompt).text.strip()
+
+
+def dashboard_summary(income: float, expenses: float, savings: float) -> str:
+    prompt = f"""
+    Monthly Income: ${income}
+    Expenses: ${expenses}
+    Savings: ${savings}
+
+    Generate a one-sentence dashboard summary with a motivational tone.
+    """
+    return model.generate_content(prompt).text.strip()
+
+
+def goal_progress(goal_name: str, target_amount: float, current_amount: float, weekly_contribution: float) -> str:
+    prompt = f"""
+    Goal: {goal_name}
+    Target: ${target_amount}
+    Current: ${current_amount}
+    Weekly Contribution: ${weekly_contribution}
+
+    Estimate how many weeks it will take to achieve this goal, and offer words of encouragement.
+    """
+    return model.generate_content(prompt).text.strip()
+
+
+def forecast_expenses(monthly_spending: dict) -> str:
+    history = "\\n".join([f"{k}: ${v}" for k, v in monthly_spending.items()])
+    prompt = f"""
+    Given this monthly spending history:
+    {history}
+
+    Forecast next month’s spending and highlight any categories that are trending upward or becoming risky.
+    """
+    return model.generate_content(prompt).text.strip()
