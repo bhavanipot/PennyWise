@@ -4,6 +4,15 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from config import Config
 from models import db, Expense, Budget
 
+from AI import (
+    ask_assistant,
+    budget_breakdown,
+    spending_insights,
+    dashboard_summary,
+    goal_progress,
+    forecast_expenses,
+)
+
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -11,9 +20,11 @@ db.init_app(app)
 CORS(app)
 jwt = JWTManager(app)
 
-# Create DB tables
+
+# Create DB table
 with app.app_context():
     db.create_all()
+
 
 # Add Expense
 @app.route("/expenses", methods=["POST"])
@@ -33,6 +44,7 @@ def add_expense():
     db.session.commit()
     return jsonify({"message": "Expense added successfully"}), 201
 
+
 # Get All Expenses
 @app.route("/expenses", methods=["GET"])
 def get_expenses():
@@ -48,12 +60,12 @@ def get_expenses():
     ]
     return jsonify(result)
 
+
 # User Logout (Frontend clears token)
 @app.route("/logout", methods=["POST"])
 @jwt_required()
 def logout():
     return jsonify({"message": "Successfully logged out. Please clear the token on client side."}), 200
-
 
 # Set Monthly Budget
 @app.route("/set-budget", methods=["POST"])
@@ -88,45 +100,72 @@ def get_budget():
 
     return jsonify({"month": month, "amount": budget.amount}), 200
 
-# Monthly Summary – Total per Category
-@app.route("/monthly-summary", methods=["GET"])
-def monthly_summary():
-    from sqlalchemy import func
+# AI Assistant: Ask Anything
+@app.route("/ai-assistant", methods=["POST"])
+def ai_assistant():
+    data = request.get_json()
+    income = data.get("income", 0)
+    expenses = data.get("expenses", 0)
+    message = data.get("message", "")
 
-    month = request.args.get("month")
-    if not month:
-        return jsonify({"error": "Month is required"}), 400
+    if not message:
+        return jsonify({"error": "Message is required"}), 400
 
-    results = db.session.query(
-        Expense.category,
-        func.sum(Expense.amount)
-    ).filter(Expense.date.startswith(month)).group_by(Expense.category).all()
+    response = ask_assistant(income, expenses, message)
+    return jsonify({"response": response}), 200
 
-    summary = [{"category": cat, "total": float(total)} for cat, total in results]
-    return jsonify(summary)
 
-# Progress Tracker – % of budget used
-@app.route("/progress", methods=["GET"])
-def progress():
-    from sqlalchemy import func
+# AI Budget Breakdown
+@app.route("/budget-breakdown", methods=["POST"])
+def budget_ai():
+    data = request.get_json()
+    income = data.get("income", 0)
+    fixed_expenses = data.get("fixed_expenses", 0)
+    savings_goal = data.get("savings_goal", 0)
 
-    month = request.args.get("month")
-    if not month:
-        return jsonify({"error": "Month is required"}), 400
+    response = budget_breakdown(income, fixed_expenses, savings_goal)
+    return jsonify({"response": response}), 200
 
-    total_spent = db.session.query(func.sum(Expense.amount)).filter(Expense.date.startswith(month)).scalar() or 0
-    budget = Budget.query.filter_by(month=month).first()
+# AI Spending Insights
+@app.route("/spending-insights", methods=["POST"])
+def spending_tips():
+    data = request.get_json()
+    categories = data.get("categories", {})
 
-    if not budget:
-        return jsonify({"message": "No budget set for this month"}), 404
+    response = spending_insights(categories)
+    return jsonify({"response": response}), 200
 
-    percentage = (total_spent / budget.amount) * 100 if budget.amount > 0 else 0
-    return jsonify({
-        "month": month,
-        "budget": budget.amount,
-        "spent": float(total_spent),
-        "progress": round(percentage, 2)
-    })
+# AI Dashboard Summary
+@app.route("/dashboard-summary", methods=["POST"])
+def dash_summary():
+    data = request.get_json()
+    income = data.get("income", 0)
+    expenses = data.get("expenses", 0)
+    savings = data.get("savings", 0)
+
+    response = dashboard_summary(income, expenses, savings)
+    return jsonify({"response": response}), 200
+
+# AI Goal Progress
+@app.route("/goal-progress", methods=["POST"])
+def goal_status():
+    data = request.get_json()
+    goal_name = data.get("goal_name", "")
+    target_amount = data.get("target_amount", 0)
+    current_amount = data.get("current_amount", 0)
+    weekly_contribution = data.get("weekly_contribution", 0)
+
+    response = goal_progress(goal_name, target_amount, current_amount, weekly_contribution)
+    return jsonify({"response": response}), 200
+
+# AI Forecast Expenses
+@app.route("/forecast-expenses", methods=["POST"])
+def forecast():
+    data = request.get_json()
+    monthly_spending = data.get("monthly_spending", {})
+
+    response = forecast_expenses(monthly_spending)
+    return jsonify({"response": response}), 200
 
 # Run App
 if __name__ == "__main__":
