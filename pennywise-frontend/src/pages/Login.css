@@ -1,0 +1,84 @@
+.login-wrapper {
+    background-color: #1c2023;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .login-left {
+    text-align: center;
+    margin-right: 80px;
+  }
+  
+  .login-logo {
+    width: 800px;
+    height: auto;
+  }
+  
+  .login-brand {
+    color: white;
+    font-size: 32px;
+    margin-top: 20px;
+  }
+  
+  .login-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2px solid #3b7c68;
+    padding: 40px;
+    border-radius: 8px;
+  }
+  
+  .login-title {
+    color: #ffffff;
+    font-size: 40px;
+    margin-bottom: 30px;
+  }
+  
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    gap: 20px;
+  }
+  
+  .login-form input {
+    padding: 16px;
+    border-radius: 28px;
+    border: none;
+    background-color: #e3be56;
+    color: white;
+    font-size: 18px;
+    text-align: center;
+  }
+  
+  .login-form button {
+    background-color: #3b7c68;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    padding: 16px;
+    border: none;
+    border-radius: 28px;
+    cursor: pointer;
+  }
+  
+  .login-form button:hover {
+    background-color: #2f5f50;
+  }
+  
+  .signup-link {
+    color: #ffffff;
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  
+  .signup-link a {
+    color: #e3be56;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  

@@ -1,0 +1,33 @@
+.form-container {
+    max-width: 400px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .form input {
+    width: 100%;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .form button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .form button:hover {
+    background-color: #0056b3;
+  }
+  

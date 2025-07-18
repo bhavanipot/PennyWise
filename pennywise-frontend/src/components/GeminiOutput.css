@@ -1,0 +1,10 @@
+.gemini-output {
+    background-color: #f4f4f4;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 2rem auto;
+    max-width: 600px;
+    text-align: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  

@@ -1,0 +1,26 @@
+.expense-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+  
+  .expense-description {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+  
+  .expense-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #555;
+    font-size: 0.9rem;
+  }
+  
+  .expense-amount {
+    color: #dc3545;
+    font-weight: bold;
+  }
+  
