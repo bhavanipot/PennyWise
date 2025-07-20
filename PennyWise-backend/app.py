@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 from config import Config
 from models import db, Expense, Budget
+from auth import auth_bp   
 
 from AI import (
     ask_assistant,
@@ -166,6 +167,9 @@ def forecast():
 
     response = forecast_expenses(monthly_spending)
     return jsonify({"response": response}), 200
+
+# Register blueprint below db/CORS config
+app.register_blueprint(auth_bp)
 
 # Run App
 if __name__ == "__main__":

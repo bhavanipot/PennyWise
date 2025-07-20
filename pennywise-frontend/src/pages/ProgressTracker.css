@@ -1,0 +1,32 @@
+/* File: src/pages/ProgressTracker.css */
+
+.progress-container {
+    background-color: #1c2023;
+    color: white;
+    padding: 3rem 2rem;
+    min-height: 100vh;
+    text-align: center;
+  }
+  
+  .progress-title {
+    font-size: 2.5rem;
+    color: #eccb5d;
+    margin-bottom: 1rem;
+  }
+  
+  .progress-subtext {
+    font-size: 1.2rem;
+    color: #ccc;
+    margin-bottom: 2rem;
+  }
+  
+  .progress-box {
+    background-color: #2b2f33;
+    border: 2px solid #3e7f71;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 80%;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(62, 127, 113, 0.4);
+  }
+  

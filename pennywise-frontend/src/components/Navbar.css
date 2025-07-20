@@ -1,0 +1,27 @@
+/* File: src/components/Navbar.css */
+
+.navbar {
+    background-color: #1c2023;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border-bottom: 2px solid #3e7f71;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  .navbar a {
+    color: #eccb5d;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: color 0.2s ease;
+  }
+  
+  .navbar a:hover {
+    color: #ffffff;
+  }
+  

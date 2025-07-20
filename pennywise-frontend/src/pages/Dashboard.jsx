@@ -1,10 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import logo from '../assets/pennywise-logo.png';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [expenses, setExpenses] = useState([]);
+  const [totalSpending, setTotalSpending] = useState(0);
+  const [suggestion, setSuggestion] = useState('');
+
+  // Fetch expenses on mount
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/expenses');
+      const data = response.data;
+
+      setExpenses(data);
+
+      const total = data.reduce((sum, expense) => sum + parseFloat(expense.amount), 0);
+      setTotalSpending(total);
+
+      // Optional: Send category-wise spending to get AI tip
+      const categoryTotals = {};
+      data.forEach((e) => {
+        categoryTotals[e.category] = (categoryTotals[e.category] || 0) + parseFloat(e.amount);
+      });
+
+      const aiResponse = await axios.post('http://localhost:5000/spending-insights', {
+        categories: categoryTotals
+      });
+
+      setSuggestion(aiResponse.data.response);
+    } catch (err) {
+      console.error('Error fetching expenses:', err);
+    }
+  };
 
   const handleLogout = () => {
     navigate('/');
@@ -21,7 +56,7 @@ const Dashboard = () => {
       </header>
 
       <section className="welcome-section">
-        <h2 className="welcome-heading">Welcome User</h2>
+        <h2 className="welcome-heading">Welcome Back!</h2>
         <p className="welcome-subtext">Track your expenses and manage your budget</p>
       </section>
 
@@ -29,13 +64,13 @@ const Dashboard = () => {
         <div className="card spending-card">
           <h3>Monthly Spending</h3>
           <div className="donut-chart">
-            <div className="donut-center">$1,250</div>
+            <div className="donut-center">${totalSpending.toFixed(2)}</div>
           </div>
         </div>
 
         <div className="card suggestion-card">
           <h3>💡 AI Suggestions</h3>
-          <p>Consider reducing your dining out expenses to save more</p>
+          <p>{suggestion || "Loading suggestions..."}</p>
         </div>
 
         <div className="card recent-card">
@@ -49,18 +84,21 @@ const Dashboard = () => {
               </tr>
             </thead>
             <tbody>
-              <tr><td>APR 20</td><td>Groceries</td><td>$200</td></tr>
-              <tr><td>APR 18</td><td>Rent</td><td>$900</td></tr>
-              <tr><td>APR 15</td><td>Utilities</td><td>$150</td></tr>
-              <tr><td>APR 10</td><td>Entertainment</td><td>$100</td></tr>
+              {expenses.slice().reverse().slice(0, 5).map((e) => (
+                <tr key={e.id}>
+                  <td>{e.date || 'N/A'}</td>
+                  <td>{e.category}</td>
+                  <td>${parseFloat(e.amount).toFixed(2)}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
 
       <div className="dashboard-actions">
-        <button className="add-button">Add Expense</button>
-        <button className="report-button">View Reports</button>
+        <button className="add-button" onClick={() => navigate('/add-expense')}>Add Expense</button>
+        <button className="report-button" onClick={() => navigate('/expense-breakdown')}>View Reports</button>
       </div>
     </div>
   );
