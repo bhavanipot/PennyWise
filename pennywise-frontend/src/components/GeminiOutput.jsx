@@ -1,6 +1,7 @@
-// File: src/components/GeminiOutput.jsx
+
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { getAuthHeaders } from '../utils/auth';
 import './GeminiOutput.css';
 
 const GeminiOutput = () => {
@@ -9,8 +10,11 @@ const GeminiOutput = () => {
   useEffect(() => {
     const fetchSuggestion = async () => {
       try {
-        // 1. Fetch expenses from backend
-        const expenseRes = await axios.get('http://localhost:5000/expenses');
+        // 1. Fetch expenses from backend with auth
+        const expenseRes = await axios.get(
+          'http://localhost:5000/expenses',
+          getAuthHeaders()
+        );
         const expenses = expenseRes.data;
 
         // 2. Group and total expenses by category
@@ -24,10 +28,12 @@ const GeminiOutput = () => {
           categoryTotals[category] += amount;
         });
 
-        // 3. Send to AI suggestion endpoint
-        const aiRes = await axios.post('http://localhost:5000/spending-insights', {
-          categories: categoryTotals
-        });
+        // 3. Send to AI suggestion endpoint with auth
+        const aiRes = await axios.post(
+          'http://localhost:5000/spending-insights',
+          { categories: categoryTotals },
+          getAuthHeaders()
+        );
 
         setSuggestion(aiRes.data.response);
       } catch (error) {

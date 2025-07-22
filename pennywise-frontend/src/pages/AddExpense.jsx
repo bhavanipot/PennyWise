@@ -1,6 +1,7 @@
 // File: src/pages/AddExpense.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import {getAuthHeaders} from '../utils/auth';
 
 const AddExpense = () => {
   const [description, setDescription] = useState('');
@@ -9,26 +10,34 @@ const AddExpense = () => {
   const [category, setCategory] = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-      const response = await axios.post('http://localhost:5000/expenses', {
+  try {
+    const response = await axios.post(
+      'http://localhost:5000/expenses',
+      {
         description,
         amount: parseFloat(amount),
         date,
         category
-      });
+      },
+      {
+        headers: {
+          ...getAuthHeaders().headers,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
 
-      alert(response.data.message);
-      // Clear form after submission
-      setDescription('');
-      setAmount('');
-      setDate('');
-      setCategory('');
-    } catch (error) {
-      alert(error.response?.data?.error || 'Failed to add expense');
-    }
-  };
+    alert(response.data.message);
+    setDescription('');
+    setAmount('');
+    setDate('');
+    setCategory('');
+  } catch (error) {
+    alert(error.response?.data?.error || 'Failed to add expense');
+  }
+};
 
   return (
     <div style={{ padding: '2rem' }}>

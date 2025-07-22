@@ -1,6 +1,8 @@
 // File: src/pages/BudgetLimit.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import {getAuthHeaders} from '../utils/auth';
+
 
 const BudgetLimit = () => {
   const [month, setMonth] = useState('');
@@ -12,10 +14,12 @@ const BudgetLimit = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/set-budget', {
+      const response = await axios.post('http://localhost:5000/set-budget',{
         month,
         amount: parseFloat(amount)
-      });
+      },
+      getAuthHeaders()
+    );
 
       setMessage(response.data.message);
       setCurrentBudget(amount);
@@ -33,7 +37,9 @@ const BudgetLimit = () => {
     try {
       const response = await axios.get('http://localhost:5000/get-budget', {
         params: { month }
-      });
+      },
+      getAuthHeaders()
+    );
 
       setCurrentBudget(response.data.amount);
       setMessage('');
