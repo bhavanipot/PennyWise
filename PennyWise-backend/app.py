@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import get_jwt_identity
 from config import Config
 from models import db, Expense, Budget
 from auth import auth_bp   
@@ -29,22 +30,22 @@ with app.app_context():
 
 # Add Expense
 @app.route("/expenses", methods=["POST"])
+@jwt_required()
 def add_expense():
+    user_id = get_jwt_identity()
     data = request.get_json()
-    if not all(k in data for k in ("amount", "category")):
-        return jsonify({"error": "Missing required fields"}), 400
 
     new_expense = Expense(
         amount=data["amount"],
         category=data["category"],
         description=data.get("description", ""),
-        date=data.get("date", "")
+        date=data.get("date", ""),
+        user_id=user_id
     )
 
     db.session.add(new_expense)
     db.session.commit()
-    return jsonify({"message": "Expense added successfully"}), 201
-
+    return jsonify({"message": "Expense added"}), 201
 
 # Get All Expenses
 @app.route("/expenses", methods=["GET"])
