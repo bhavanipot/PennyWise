@@ -1,80 +1,72 @@
-// File: src/pages/AddExpense.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import {getAuthHeaders} from '../utils/auth';
+import './AddExpense.css';
+import logo from '../assets/pennywise-logo.png';
 
 const AddExpense = () => {
-  const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState('');
-  const [category, setCategory] = useState('');
+  const [form, setForm] = useState({
+    amount: '',
+    date: '',
+    category: '',
+    description: ''
+  });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    const token = localStorage.getItem("token");
 
-  try {
-    const response = await axios.post(
-      'http://localhost:5000/expenses',
-      {
-        description,
-        amount: parseFloat(amount),
-        date,
-        category
-      },
-      {
-        headers: {
-          ...getAuthHeaders().headers,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    alert(response.data.message);
-    setDescription('');
-    setAmount('');
-    setDate('');
-    setCategory('');
-  } catch (error) {
-    alert(error.response?.data?.error || 'Failed to add expense');
-  }
-};
+    try {
+      await axios.post("http://localhost:5000/expenses", form, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      alert("Expense added!");
+      setForm({ amount: '', date: '', category: '', description: '' });
+    } catch (err) {
+      alert("Failed to add expense.");
+    }
+  };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h2>Add Expense</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-        <br />
+    <div className="expense-container">
+      <form className="expense-form" onSubmit={handleSubmit}>
+        <img src={logo} alt="Logo" className="logo" />
+        <h2 className="expense-title">Add Expense</h2>
+
         <input
           type="number"
+          name="amount"
           placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          value={form.amount}
+          onChange={handleChange}
           required
         />
-        <br />
-        <input
-          type="text"
-          placeholder="Category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          required
-        />
-        <br />
         <input
           type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          name="date"
+          value={form.date}
+          onChange={handleChange}
           required
         />
-        <br />
-        <button type="submit">Add</button>
+        <input
+          type="text"
+          name="category"
+          placeholder="Category"
+          value={form.category}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="description"
+          placeholder="Description"
+          value={form.description}
+          onChange={handleChange}
+        />
+        <button type="submit">ADD EXPENSE</button>
       </form>
     </div>
   );

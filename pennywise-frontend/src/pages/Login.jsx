@@ -18,9 +18,16 @@ const Login = () => {
         password,
       });
 
-      localStorage.setItem('token', res.data.access_token);
-      navigate('/dashboard');
+      const token = res.data.access_token;
+      if (token) {
+        localStorage.setItem('token', token); //  Store token
+        console.log("Token stored:", token);   //  Confirm in console
+        navigate('/dashboard');               // Redirect after login
+      } else {
+        throw new Error("No token received");
+      }
     } catch (err) {
+      console.error("Login error:", err);
       alert(err.response?.data?.error || 'Login failed');
     }
   };

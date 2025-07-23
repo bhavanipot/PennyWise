@@ -6,18 +6,24 @@ import ExpenseCard from './ExpenseCard';
 const ExpenseList = () => {
   const [expenses, setExpenses] = useState([]);
 
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const res = await axios.get('http://localhost:5000/expenses');
-        setExpenses(res.data);
-      } catch (error) {
-        console.error("Failed to fetch expenses", error);
-      }
-    };
+useEffect(() => {
+  const fetchExpenses = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/expenses', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      setExpenses(res.data); //  state with fetched data
+    } catch (error) {
+      console.error("Failed to fetch expenses", error);
+    }
+  };
 
-    fetchExpenses();
-  }, []);
+  fetchExpenses();
+}, []);
+
+ 
 
   return (
     <div style={{ padding: '1rem' }}>
