@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Load API key
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-2.5-flash")
 
 
 #Will add a RAG Pipeline for more personalized results 
@@ -78,3 +78,7 @@ def forecast_expenses(monthly_spending: dict) -> str:
     Forecast next month’s spending and highlight any categories that are trending upward or becoming risky.
     """
     return model.generate_content(prompt).text.strip()
+
+#For testing:
+#response = ask_assistant(200, 40, "Is this good? Or do I need to reduce my expenses?")
+#print(response)
