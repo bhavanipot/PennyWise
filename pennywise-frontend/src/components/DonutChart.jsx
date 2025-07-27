@@ -19,7 +19,7 @@ const DonutChart = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/expenses');
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/expenses`);
         const expenses = res.data;
 
         const totals = {};

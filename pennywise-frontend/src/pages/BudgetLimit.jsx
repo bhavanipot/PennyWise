@@ -14,7 +14,7 @@ const BudgetLimit = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:5000/set-budget',{
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/set-budget`,{
         month,
         amount: parseFloat(amount)
       },

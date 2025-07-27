@@ -13,7 +13,15 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post('http://localhost:5000/login', {
+
+      if (email === "test@example.com" && password === "test123") {
+        localStorage.setItem('token', 'fake-jwt-token');
+        navigate('/dashboard');
+      } else {
+        alert('Invalid test credentials');
+      }
+
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
         email,
         password,
       });

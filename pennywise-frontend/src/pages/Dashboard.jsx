@@ -44,7 +44,7 @@ const Dashboard = () => {
 
       // 4. Fetch AI spending insight (with auth token)
       const aiResponse = await axios.post(
-        'http://localhost:5000/spending-insights',
+        `${process.env.REACT_APP_API_URL}/spending-insights`,
         { categories: categoryTotals },
         getAuthHeaders()
       );

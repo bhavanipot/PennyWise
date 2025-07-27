@@ -12,7 +12,7 @@ const GeminiOutput = () => {
       try {
         // 1. Fetch expenses from backend with auth
         const expenseRes = await axios.get(
-          'http://localhost:5000/expenses',
+          `${process.env.REACT_APP_API_URL}/expenses`,
           getAuthHeaders()
         );
         const expenses = expenseRes.data;
