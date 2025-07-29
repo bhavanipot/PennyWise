@@ -11,7 +11,7 @@
 - **Axios**  
 - **React Router** – 
 - **Tailwind CSS + Custom CSS**
-- 
+  
 ### Backend
 - **Flask (Python)**   
 - **SQLAlchemy + SQLite**  
