@@ -11,48 +11,54 @@ const Dashboard = () => {
   const [totalSpending, setTotalSpending] = useState(0);
   const [suggestion, setSuggestion] = useState('');
   const [customQuery, setCustomQuery] = useState('');
+  const [chatResponse, setChatResponse] = useState('');
   const [loadingAI, setLoadingAI] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false); // ✅ new
 
   useEffect(() => {
     fetchExpenses();
   }, []);
 
   const fetchExpenses = async () => {
+    const categoryTotals = {}; // Moved outside so it's accessible in catch
+  
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_API_URL}/expenses`,
         getAuthHeaders()
       );
       const data = response.data;
-
+  
       setExpenses(data);
-
-      // Calculate total spending
+  
       const total = data.reduce(
         (sum, expense) => sum + parseFloat(expense.amount),
         0
       );
       setTotalSpending(total);
-
-      // Default AI suggestion (from category data)
-      const categoryTotals = {};
+  
       data.forEach((e) => {
         categoryTotals[e.category] =
           (categoryTotals[e.category] || 0) + parseFloat(e.amount);
       });
-
+  
       const aiResponse = await axios.post(
         `${process.env.REACT_APP_API_URL}/spending-insights`,
         { categories: categoryTotals },
         getAuthHeaders()
       );
-
+  
       setSuggestion(aiResponse.data.response);
     } catch (err) {
-      console.error('Error fetching expenses or AI insight:', err);
-      setSuggestion('Unable to load AI suggestions.');
+      console.warn('AI suggestion failed, using dynamic fallback.');
+  
+      const topCategory = Object.entries(categoryTotals)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'a high-spending category';
+  
+      setSuggestion(`💡 Try to reduce spending in ${topCategory}, where you spent the most.`);
     }
   };
+  
 
   const handleQuerySubmit = async () => {
     if (!customQuery.trim()) return;
@@ -64,13 +70,12 @@ const Dashboard = () => {
         { query: customQuery },
         getAuthHeaders()
       );
-      setSuggestion(response.data.response);
+      setChatResponse(response.data.response);
     } catch (err) {
       console.error('AI query error:', err);
-      setSuggestion('❌ AI failed to respond.');
+      setChatResponse('❌ AI failed to respond.');
     } finally {
       setLoadingAI(false);
-      setCustomQuery('');
     }
   };
 
@@ -108,17 +113,10 @@ const Dashboard = () => {
 
         <div className="card suggestion-card">
           <h3>💡 AI Suggestions</h3>
-          <p>{loadingAI ? 'Thinking...' : suggestion || 'No suggestions yet.'}</p>
-
-          <div className="ai-query-box">
-            <input
-              type="text"
-              placeholder="Ask PennyWise anything..."
-              value={customQuery}
-              onChange={(e) => setCustomQuery(e.target.value)}
-            />
-            <button onClick={handleQuerySubmit}>Ask</button>
-          </div>
+          <p>{suggestion || 'Loading suggestions...'}</p>
+          <button className="ask-button" onClick={() => setShowChatModal(true)}>
+            Ask PennyWise 💬
+          </button>
         </div>
 
         <div className="card recent-card">
@@ -156,6 +154,28 @@ const Dashboard = () => {
           View Reports
         </button>
       </div>
+      
+
+      {/* ✅ AI Chat Modal */}
+      {showChatModal && (
+        <div className="ai-modal-overlay">
+          <div className="ai-modal">
+            <h3>Ask PennyWise 💬</h3>
+            <input
+              type="text"
+              placeholder="e.g. How can I reduce my grocery spending?"
+              value={customQuery}
+              onChange={(e) => setCustomQuery(e.target.value)}
+            />
+            <div className="modal-buttons">
+              <button onClick={handleQuerySubmit}>Submit</button>
+              <button onClick={() => setShowChatModal(false)}>Back</button>
+            </div>
+            {loadingAI && <p>Thinking...</p>}
+            {chatResponse && <p className="chat-response">{chatResponse}</p>}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
