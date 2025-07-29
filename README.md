@@ -1,6 +1,6 @@
 # PennyWise: Smart Budget Tracker with AI Insights
 
-**PennyWise** is a smart, all-in-one budgeting assistant that helps you track your expenses, set savings goals, and receive personalized financial advice — all powered by **Gemini AI**.
+**PennyWise** is a smart, all-in-one budgeting assistant that helps you track your expenses, set savings goals, and receive personalized financial advice, all powered by **Gemini AI**.
 
 ---
 
