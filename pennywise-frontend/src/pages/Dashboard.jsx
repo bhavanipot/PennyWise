@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
@@ -11,38 +10,37 @@ const Dashboard = () => {
   const [expenses, setExpenses] = useState([]);
   const [totalSpending, setTotalSpending] = useState(0);
   const [suggestion, setSuggestion] = useState('');
+  const [customQuery, setCustomQuery] = useState('');
+  const [loadingAI, setLoadingAI] = useState(false);
 
-  // Fetch expenses and AI suggestion on mount
   useEffect(() => {
     fetchExpenses();
   }, []);
 
   const fetchExpenses = async () => {
     try {
-      // 1. Fetch user expenses (with auth token)
       const response = await axios.get(
-        'http://localhost:5000/expenses',
+        `${process.env.REACT_APP_API_URL}/expenses`,
         getAuthHeaders()
       );
       const data = response.data;
 
       setExpenses(data);
 
-      // 2. Calculate total spending
+      // Calculate total spending
       const total = data.reduce(
         (sum, expense) => sum + parseFloat(expense.amount),
         0
       );
       setTotalSpending(total);
 
-      // 3. Group expenses by category
+      // Default AI suggestion (from category data)
       const categoryTotals = {};
       data.forEach((e) => {
         categoryTotals[e.category] =
           (categoryTotals[e.category] || 0) + parseFloat(e.amount);
       });
 
-      // 4. Fetch AI spending insight (with auth token)
       const aiResponse = await axios.post(
         `${process.env.REACT_APP_API_URL}/spending-insights`,
         { categories: categoryTotals },
@@ -53,6 +51,26 @@ const Dashboard = () => {
     } catch (err) {
       console.error('Error fetching expenses or AI insight:', err);
       setSuggestion('Unable to load AI suggestions.');
+    }
+  };
+
+  const handleQuerySubmit = async () => {
+    if (!customQuery.trim()) return;
+
+    try {
+      setLoadingAI(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/ask-ai`,
+        { query: customQuery },
+        getAuthHeaders()
+      );
+      setSuggestion(response.data.response);
+    } catch (err) {
+      console.error('AI query error:', err);
+      setSuggestion('❌ AI failed to respond.');
+    } finally {
+      setLoadingAI(false);
+      setCustomQuery('');
     }
   };
 
@@ -90,7 +108,17 @@ const Dashboard = () => {
 
         <div className="card suggestion-card">
           <h3>💡 AI Suggestions</h3>
-          <p>{suggestion || 'Loading suggestions...'}</p>
+          <p>{loadingAI ? 'Thinking...' : suggestion || 'No suggestions yet.'}</p>
+
+          <div className="ai-query-box">
+            <input
+              type="text"
+              placeholder="Ask PennyWise anything..."
+              value={customQuery}
+              onChange={(e) => setCustomQuery(e.target.value)}
+            />
+            <button onClick={handleQuerySubmit}>Ask</button>
+          </div>
         </div>
 
         <div className="card recent-card">
@@ -121,16 +149,10 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-actions">
-        <button
-          className="add-button"
-          onClick={() => navigate('/add-expense')}
-        >
+        <button className="add-button" onClick={() => navigate('/add-expense')}>
           Add Expense
         </button>
-        <button
-          className="report-button"
-          onClick={() => navigate('/expense-breakdown')}
-        >
+        <button className="report-button" onClick={() => navigate('/expense-breakdown')}>
           View Reports
         </button>
       </div>

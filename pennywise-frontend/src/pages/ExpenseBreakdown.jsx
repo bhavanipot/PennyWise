@@ -11,6 +11,8 @@ import {
   Title,
 } from 'chart.js';
 
+import { getAuthHeaders } from '../utils/auth';
+
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 const ExpenseBreakdownChart = () => {
@@ -19,18 +21,16 @@ const ExpenseBreakdownChart = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/expenses`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/expenses`,
+          getAuthHeaders()
+        );
 
-        const expenses = res.data.expenses || res.data;
+        const expenses = Array.isArray(res.data) ? res.data : res.data.expenses;
 
         const totals = {};
         for (const expense of expenses) {
-          const category = expense.category;
-          const amount = expense.amount;
+          const { category, amount } = expense;
           if (category && typeof amount === 'number') {
             totals[category] = (totals[category] || 0) + amount;
           }
@@ -97,9 +97,13 @@ const ExpenseBreakdownChart = () => {
         alignItems: 'center',
       }}
     >
-      <div style={{ width: '450px', height: '450px' }}>
-        <Doughnut data={data} options={options} />
-      </div>
+      {labels.length > 0 ? (
+        <div style={{ width: '450px', height: '450px' }}>
+          <Doughnut data={data} options={options} />
+        </div>
+      ) : (
+        <p style={{ color: '#ccc', fontSize: '18px' }}>No spending data available.</p>
+      )}
     </div>
   );
 };

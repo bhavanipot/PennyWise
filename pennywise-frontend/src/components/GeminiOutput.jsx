@@ -1,36 +1,28 @@
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { getAuthHeaders } from '../utils/auth';
 import './GeminiOutput.css';
 
-const GeminiOutput = () => {
+const GeminiOutput = ({ expenses }) => {
   const [suggestion, setSuggestion] = useState('Loading...');
 
   useEffect(() => {
     const fetchSuggestion = async () => {
-      try {
-        // 1. Fetch expenses from backend with auth
-        const expenseRes = await axios.get(
-          `${process.env.REACT_APP_API_URL}/expenses`,
-          getAuthHeaders()
-        );
-        const expenses = expenseRes.data;
+      if (!expenses || expenses.length === 0) {
+        setSuggestion('No expenses yet to analyze.');
+        return;
+      }
 
-        // 2. Group and total expenses by category
+      try {
         const categoryTotals = {};
-        expenses.forEach((expense) => {
-          const category = expense.category;
-          const amount = parseFloat(expense.amount);
-          if (!categoryTotals[category]) {
-            categoryTotals[category] = 0;
-          }
-          categoryTotals[category] += amount;
+        expenses.forEach(({ category, amount }) => {
+          if (!category) return;
+          categoryTotals[category] =
+            (categoryTotals[category] || 0) + parseFloat(amount);
         });
 
-        // 3. Send to AI suggestion endpoint with auth
         const aiRes = await axios.post(
-          'http://localhost:5000/spending-insights',
+          `${process.env.REACT_APP_API_URL}/spending-insights`,
           { categories: categoryTotals },
           getAuthHeaders()
         );
@@ -43,7 +35,7 @@ const GeminiOutput = () => {
     };
 
     fetchSuggestion();
-  }, []);
+  }, [expenses]);
 
   return (
     <div className="gemini-output">

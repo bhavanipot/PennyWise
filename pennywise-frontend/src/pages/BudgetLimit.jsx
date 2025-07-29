@@ -1,8 +1,6 @@
-// File: src/pages/BudgetLimit.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import {getAuthHeaders} from '../utils/auth';
-
+import { getAuthHeaders } from '../utils/auth';
 
 const BudgetLimit = () => {
   const [month, setMonth] = useState('');
@@ -14,12 +12,11 @@ const BudgetLimit = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/set-budget`,{
-        month,
-        amount: parseFloat(amount)
-      },
-      getAuthHeaders()
-    );
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/set-budget`,
+        { month, amount: parseFloat(amount) },
+        getAuthHeaders()
+      );
 
       setMessage(response.data.message);
       setCurrentBudget(amount);
@@ -35,11 +32,13 @@ const BudgetLimit = () => {
     }
 
     try {
-      const response = await axios.get('http://localhost:5000/get-budget', {
-        params: { month }
-      },
-      getAuthHeaders()
-    );
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/get-budget`,
+        {
+          params: { month },
+          headers: getAuthHeaders().headers
+        }
+      );
 
       setCurrentBudget(response.data.amount);
       setMessage('');
@@ -51,15 +50,19 @@ const BudgetLimit = () => {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h2>Set Monthly Budget</h2>
+      <h2 style={{ marginBottom: '1rem' }}>🎯 Set Monthly Budget</h2>
+
       <form onSubmit={handleSetBudget}>
+        <label>Select Month:</label><br />
         <input
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
           required
         />
-        <br />
+        <br /><br />
+
+        <label>Budget Amount:</label><br />
         <input
           type="number"
           placeholder="Enter budget amount"
@@ -67,16 +70,17 @@ const BudgetLimit = () => {
           onChange={(e) => setAmount(e.target.value)}
           required
         />
-        <br />
-        <button type="submit">Set Budget</button>
+        <br /><br />
+
+        <button type="submit">💾 Set Budget</button>
       </form>
 
       <br />
-      <button onClick={handleFetchBudget}>Check Current Budget</button>
+      <button onClick={handleFetchBudget}>📊 Check Current Budget</button>
 
-      {message && <p style={{ marginTop: '1rem' }}>{message}</p>}
+      {message && <p style={{ marginTop: '1rem', color: 'orange' }}>{message}</p>}
       {currentBudget !== null && (
-        <p>Budget for {month}: ${currentBudget}</p>
+        <p>Budget for {month}: <strong>${currentBudget}</strong></p>
       )}
     </div>
   );

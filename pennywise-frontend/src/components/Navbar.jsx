@@ -1,17 +1,35 @@
-// File: src/components/Navbar.jsx
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+
   return (
     <nav className="navbar">
-      <Link to="/dashboard">Dashboard</Link>
-      <Link to="/add-expense">Add Expense</Link>
-      <Link to="/budget-limit">Budget Limit</Link>
-      <Link to="/expense-breakdown">Breakdown</Link>
-      <Link to="/progress">Progress</Link>
-      <Link to="/">Logout</Link>
+      <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>
+        Dashboard
+      </NavLink>
+      <NavLink to="/add-expense" className={({ isActive }) => isActive ? 'active' : ''}>
+        Add Expense
+      </NavLink>
+      <NavLink to="/budget-limit" className={({ isActive }) => isActive ? 'active' : ''}>
+        Budget Limit
+      </NavLink>
+      <NavLink to="/expense-breakdown" className={({ isActive }) => isActive ? 'active' : ''}>
+        Breakdown
+      </NavLink>
+      <NavLink to="/progress" className={({ isActive }) => isActive ? 'active' : ''}>
+        Progress
+      </NavLink>
+      <button className="logout-button" onClick={handleLogout}>
+        Logout
+      </button>
     </nav>
   );
 };

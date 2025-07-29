@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // <-- needed for redirect
 import './AddExpense.css';
 import logo from '../assets/pennywise-logo.png';
 
 const AddExpense = () => {
+  const navigate = useNavigate(); // ✅
+
   const [form, setForm] = useState({
     amount: '',
     date: '',
@@ -23,10 +26,15 @@ const AddExpense = () => {
       await axios.post(`${process.env.REACT_APP_API_URL}/expenses`, form, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      alert("Expense added!");
+
+      alert("✅ Expense added!");
       setForm({ amount: '', date: '', category: '', description: '' });
+
+      // ✅ Redirect to dashboard
+      navigate('/dashboard');
     } catch (err) {
-      alert("Failed to add expense.");
+      alert("❌ Failed to add expense.");
+      console.error(err);
     }
   };
 
@@ -67,6 +75,15 @@ const AddExpense = () => {
           onChange={handleChange}
         />
         <button type="submit">ADD EXPENSE</button>
+
+        {/* Optional cancel/back button */}
+        <button
+          type="button"
+          style={{ marginTop: '10px', backgroundColor: '#ccc' }}
+          onClick={() => navigate('/dashboard')}
+        >
+          Cancel
+        </button>
       </form>
     </div>
   );

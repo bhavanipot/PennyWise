@@ -1,4 +1,3 @@
-// File: src/pages/Signup.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -12,12 +11,16 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
     if (password !== confirmPassword) {
-      alert("Passwords don't match!");
+      setError("❌ Passwords don't match.");
       return;
     }
 
@@ -27,10 +30,10 @@ const Signup = () => {
         password
       });
 
-      alert(response.data.message);
-      navigate('/');
+      setSuccess(response.data.message);
+      setTimeout(() => navigate('/'), 1500); // brief pause before redirect
     } catch (error) {
-      alert(error.response?.data?.error || 'Signup failed');
+      setError(error.response?.data?.error || 'Signup failed.');
     }
   };
 
@@ -70,6 +73,11 @@ const Signup = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
+
+          {/* Inline error or success messages */}
+          {error && <p className="form-error">{error}</p>}
+          {success && <p className="form-success">{success}</p>}
+
           <button className="signup-button" type="submit">
             Create Account
           </button>

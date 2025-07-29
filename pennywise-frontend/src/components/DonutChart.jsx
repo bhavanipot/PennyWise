@@ -1,8 +1,8 @@
-// File: src/components/DonutChart.jsx
 import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import axios from 'axios';
 import './DonutChart.css';
+import { getAuthHeaders } from '../utils/auth'; // ✅ For auth header
 
 import {
   Chart as ChartJS,
@@ -19,13 +19,23 @@ const DonutChart = () => {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const res = await axios.get(`${process.env.REACT_APP_API_URL}/expenses`);
+        const res = await axios.get(
+          `${process.env.REACT_APP_API_URL}/expenses`,
+          getAuthHeaders() // ✅ Auth token
+        );
+
         const expenses = res.data;
 
         const totals = {};
-        expenses.forEach(e => {
+        expenses.forEach((e) => {
+          if (!e.category) return;
           totals[e.category] = (totals[e.category] || 0) + parseFloat(e.amount);
         });
+
+        if (Object.keys(totals).length === 0) {
+          setChartData(null);
+          return;
+        }
 
         setChartData({
           labels: Object.keys(totals),
@@ -38,7 +48,7 @@ const DonutChart = () => {
           ],
         });
       } catch (err) {
-        console.error("Failed to fetch expenses:", err);
+        console.error('Failed to fetch expenses:', err);
       }
     };
 
@@ -47,7 +57,13 @@ const DonutChart = () => {
 
   return (
     <div className="donut-chart">
-      {chartData ? <Doughnut data={chartData} /> : <p>Loading chart...</p>}
+      {chartData ? (
+        <Doughnut data={chartData} />
+      ) : (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>
+          No spending data to display.
+        </p>
+      )}
     </div>
   );
 };

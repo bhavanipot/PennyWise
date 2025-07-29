@@ -8,17 +8,20 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
 
     try {
-
-      if (email === "test@example.com" && password === "test123") {
+      if (email === 'test@example.com' && password === 'test123') {
         localStorage.setItem('token', 'fake-jwt-token');
-        navigate('/dashboard');
-      } else {
-        alert('Invalid test credentials');
+        setSuccess('Test login successful!');
+        setTimeout(() => navigate('/dashboard'), 1000);
+        return;
       }
 
       const res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
@@ -28,15 +31,15 @@ const Login = () => {
 
       const token = res.data.access_token;
       if (token) {
-        localStorage.setItem('token', token); //  Store token
-        console.log("Token stored:", token);   //  Confirm in console
-        navigate('/dashboard');               // Redirect after login
+        localStorage.setItem('token', token);
+        setSuccess('Login successful!');
+        setTimeout(() => navigate('/dashboard'), 1000);
       } else {
-        throw new Error("No token received");
+        setError('Login failed — no token received.');
       }
     } catch (err) {
-      console.error("Login error:", err);
-      alert(err.response?.data?.error || 'Login failed');
+      console.error('Login error:', err);
+      setError(err.response?.data?.error || 'Login failed.');
     }
   };
 
@@ -62,6 +65,11 @@ const Login = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          {/* ✅ UI Feedback Messages */}
+          {error && <p className="form-error">{error}</p>}
+          {success && <p className="form-success">{success}</p>}
+
           <button type="submit">ENTER</button>
         </form>
         <p className="signup-link">

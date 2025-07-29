@@ -156,3 +156,30 @@ body, html {
   .report-button:hover {
     background-color: #256759;
   }
+
+  .ai-query-box {
+    margin-top: 1rem;
+    display: flex;
+    gap: 10px;
+  }
+  
+  .ai-query-box input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+  }
+  
+  .ai-query-box button {
+    padding: 8px 14px;
+    background-color: #5d8fd3;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  
+  .ai-query-box button:hover {
+    background-color: #416db6;
+  }
+  

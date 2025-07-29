@@ -82,3 +82,17 @@
     text-decoration: underline;
   }
   
+  .form-error {
+    color: #dc3545;
+    font-weight: 500;
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+  }
+  
+  .form-success {
+    color: #28a745;
+    font-weight: 500;
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+  }
+  
